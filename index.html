@@ -834,3 +834,53 @@
     if (state.lastPosterDataURL) {
       const link = document.createElement('a');
       link.download = `aura-poster-${state.style}-${Date.now()}.png`;
+      link.href = state.lastPosterDataURL;
+      link.click();
+      setStatus('⬇ Poster downloaded!', false);
+    }
+  });
+
+  // Reset button
+  resetBtn.addEventListener('click', () => {
+    bgInput.value = '';
+    fgInput.value = '';
+    state.bgImage = null;
+    state.fgImage = null;
+    state.cutoutImage = null;
+    state.bgLoaded = false;
+    state.fgLoaded = false;
+    state.cutoutReady = false;
+    state.lastPosterDataURL = null;
+    downloadBtn.disabled = true;
+    updateButtons();
+
+    // Reset canvas to placeholder
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0d0b09';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '400 28px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#3a3228';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎨 Your AI poster will appear here', canvas.width/2, canvas.height/2);
+    ctx.font = '300 18px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#2a241e';
+    ctx.fillText('Upload background + subject to start', canvas.width/2, canvas.height/2 + 50);
+
+    setStatus('Reset complete. Upload both images to begin.', false);
+  });
+
+  // Initialize placeholder
+  ctx.fillStyle = '#0d0b09';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '400 28px "Segoe UI", sans-serif';
+  ctx.fillStyle = '#3a3228';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🎨 Your AI poster will appear here', canvas.width/2, canvas.height/2);
+  ctx.font = '300 18px "Segoe UI", sans-serif';
+  ctx.fillStyle = '#2a241e';
+  ctx.fillText('Upload background + subject to start', canvas.width/2, canvas.height/2 + 50);
+</script>
+</body>
+</html>
