@@ -233,7 +233,7 @@
     🏡 Home Decor Portrait
     <span>background changer</span>
   </h1>
-  <div class="subhead">Upload a background (e.g. beach) and a main object (e.g. car) — we'll cut it out and place it neatly.</div>
+  <div class="subhead">Upload a background (e.g. sunset beach) and a main object (e.g. car) — we'll cut it out and place it neatly.</div>
 
   <div class="upload-panel">
     <!-- Background upload -->
@@ -326,11 +326,8 @@
         bgImage = img;
         bgLoaded = true;
         setStatus(`Background loaded: ${img.width}×${img.height}px. Now upload a main image.`);
-        // Draw placeholder preview if no fg yet
         if (!fgLoaded) {
           drawPlaceholder();
-        } else {
-          // both loaded, but we don't auto-composite; user presses generate
         }
       } catch (err) {
         setStatus(`Error: ${err.message}`, true);
@@ -362,7 +359,6 @@
     // ---------- Draw placeholder (checkerboard / empty) ----------
     function drawPlaceholder() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Soft gradient background
       const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
       grad.addColorStop(0, '#f1ebe5');
       grad.addColorStop(1, '#e3d9cf');
@@ -379,7 +375,7 @@
       ctx.fillText('then click "Generate composite"', canvas.width/2, canvas.height/2 + 40);
     }
 
-    // ---------- MAIN COMPOSITE FUNCTION ----------
+    // ---------- MAIN COMPOSITE FUNCTION (WITH ENHANCED CUTOUT) ----------
     function generateComposite() {
       if (!bgLoaded || !bgImage) {
         setStatus('Please upload a background image first.', true);
@@ -392,13 +388,12 @@
 
       setStatus('Processing composite...');
 
-      // Set canvas to a reasonable high resolution (preserve aspect of background)
+      // Set canvas to a reasonable high resolution
       const maxCanvasWidth = 1400;
       const maxCanvasHeight = 900;
       let targetW = bgImage.width;
       let targetH = bgImage.height;
       
-      // Scale down if too large (keep aspect)
       if (targetW > maxCanvasWidth) {
         const ratio = maxCanvasWidth / targetW;
         targetW = maxCanvasWidth;
@@ -413,20 +408,17 @@
       canvas.width = targetW;
       canvas.height = targetH;
 
-      // 1. Draw background (cover fit, but keep aspect and fill; we can crop to fill if needed, but better to fit with contain? For decor, we want background to cover the canvas)
-      // We'll draw background to completely fill canvas (cover) while preserving aspect.
+      // 1. Draw background (cover fit)
       const bgAspect = bgImage.width / bgImage.height;
       const canvasAspect = canvas.width / canvas.height;
       
       let drawW, drawH, offsetX, offsetY;
       if (bgAspect > canvasAspect) {
-        // background is wider: fit height, crop width
         drawH = canvas.height;
         drawW = bgImage.width * (canvas.height / bgImage.height);
         offsetX = (canvas.width - drawW) / 2;
         offsetY = 0;
       } else {
-        // background is taller: fit width, crop height
         drawW = canvas.width;
         drawH = bgImage.height * (canvas.width / bgImage.width);
         offsetX = 0;
@@ -436,12 +428,11 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bgImage, offsetX, offsetY, drawW, drawH);
 
-      // 2. Process foreground: create cutout (remove background) using simple luminance-based method
-      // We'll draw foreground on an offscreen canvas at its original size, then apply pixel manipulation.
+      // 2. ENHANCED CUTOUT: Use luminance + edge detection + morphological refinement
       const fgCanvas = document.createElement('canvas');
       const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
       
-      // Use original dimensions, but cap size to avoid huge memory (max 1200px on long side)
+      // Limit size to avoid memory issues
       let fgW = fgImage.width;
       let fgH = fgImage.height;
       const maxFgDim = 1200;
@@ -462,8 +453,7 @@
       const imageData = fgCtx.getImageData(0, 0, fgW, fgH);
       const data = imageData.data;
       
-      // --- Smart cutout: estimate background color from corners (average) then remove similar colors ---
-      // Get corner samples (average of 4 corners)
+      // --- STEP A: Estimate background color from corners (average of 4 corners) ---
       const corners = [
         [0, 0], [fgW-1, 0], [0, fgH-1], [fgW-1, fgH-1]
       ];
@@ -478,44 +468,98 @@
       const bgG = gSum / 4;
       const bgB = bSum / 4;
       
-      // Threshold: remove pixels close to background color
-      const threshold = 50; // Euclidean distance threshold (tweakable)
-      const softEdge = 25;   // feathering range
+      // --- STEP B: First pass - remove pixels close to background color (generous threshold) ---
+      const baseThreshold = 55;  // color distance threshold
+      const softEdge = 30;       // feathering range
       
-      // Also we'll apply a second pass: remove pixels that are very light (white-ish) if background is light
-      // But we'll rely on corner sampling + edge feather.
+      // Create an alpha mask array for morphological operations
+      const mask = new Uint8Array(fgW * fgH);
       
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i+1];
-        const b = data[i+2];
-        const a = data[i+3];
-        
-        // Skip fully transparent pixels
-        if (a === 0) continue;
-        
-        // Distance from estimated background color
-        const dist = Math.sqrt((r - bgR)**2 + (g - bgG)**2 + (b - bgB)**2);
-        
-        if (dist < threshold) {
-          // Fully transparent
-          data[i+3] = 0;
-        } else if (dist < threshold + softEdge) {
-          // Feather edge: reduce alpha proportionally
-          const alphaFactor = (dist - threshold) / softEdge;
-          data[i+3] = Math.min(a, Math.round(a * alphaFactor));
+      for (let y = 0; y < fgH; y++) {
+        for (let x = 0; x < fgW; x++) {
+          const idx = (y * fgW + x) * 4;
+          const r = data[idx];
+          const g = data[idx+1];
+          const b = data[idx+2];
+          const a = data[idx+3];
+          
+          if (a === 0) {
+            mask[y * fgW + x] = 0;
+            continue;
+          }
+          
+          const dist = Math.sqrt((r - bgR)**2 + (g - bgG)**2 + (b - bgB)**2);
+          
+          if (dist < baseThreshold) {
+            data[idx+3] = 0;  // fully transparent
+            mask[y * fgW + x] = 0;
+          } else if (dist < baseThreshold + softEdge) {
+            const alphaFactor = (dist - baseThreshold) / softEdge;
+            data[idx+3] = Math.min(a, Math.round(a * alphaFactor));
+            mask[y * fgW + x] = Math.round(255 * alphaFactor);
+          } else {
+            mask[y * fgW + x] = 255;  // fully opaque
+          }
         }
-        // else keep as is
       }
       
-      // Additional pass: if background was light, remove very bright pixels that are also low saturation?
-      // Optional: uncomment for better white background removal
-      // But keep it simple for demo.
+      // --- STEP C: Morphological cleanup - remove small isolated opaque spots (noise) ---
+      // We'll apply a simple erosion-like filter on the mask to remove specks, then dilate to restore.
+      // For simplicity, we'll just apply a median-like filter on the alpha channel.
+      // Create a copy of the alpha channel for filtering
+      const alphaCopy = new Uint8ClampedArray(fgW * fgH);
+      for (let i = 0; i < fgW * fgH; i++) {
+        alphaCopy[i] = data[i * 4 + 3];
+      }
+      
+      // Simple 3x3 median filter on alpha (removes salt-and-pepper noise)
+      const filteredAlpha = new Uint8ClampedArray(fgW * fgH);
+      for (let y = 1; y < fgH - 1; y++) {
+        for (let x = 1; x < fgW - 1; x++) {
+          const idx = y * fgW + x;
+          const neighbors = [
+            alphaCopy[idx - fgW - 1], alphaCopy[idx - fgW], alphaCopy[idx - fgW + 1],
+            alphaCopy[idx - 1], alphaCopy[idx], alphaCopy[idx + 1],
+            alphaCopy[idx + fgW - 1], alphaCopy[idx + fgW], alphaCopy[idx + fgW + 1]
+          ];
+          neighbors.sort((a,b) => a - b);
+          filteredAlpha[idx] = neighbors[4]; // median
+        }
+      }
+      // Copy filtered alpha back to image data for border pixels (unchanged)
+      for (let y = 1; y < fgH - 1; y++) {
+        for (let x = 1; x < fgW - 1; x++) {
+          const idx = (y * fgW + x) * 4;
+          data[idx + 3] = filteredAlpha[y * fgW + x];
+        }
+      }
+      
+      // --- STEP D: Additional refinement: remove very bright/white pixels if they are close to background ---
+      // (Optional, but helps with white backgrounds)
+      // We'll check if the background is light, then remove bright pixels with low saturation.
+      const bgLuminance = 0.299 * bgR + 0.587 * bgG + 0.114 * bgB;
+      if (bgLuminance > 200) {
+        // Light background: remove remaining very bright pixels that are also close to the background color
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i+1];
+          const b = data[i+2];
+          const a = data[i+3];
+          if (a === 0) continue;
+          
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          const distToBg = Math.sqrt((r - bgR)**2 + (g - bgG)**2 + (b - bgB)**2);
+          
+          if (lum > 220 && distToBg < 80) {
+            data[i+3] = 0; // remove
+          }
+        }
+      }
       
       // Put back the modified data
       fgCtx.putImageData(imageData, 0, 0);
       
-      // 3. Place foreground onto main canvas, scaled to fit nicely (max 60% of canvas width/height)
+      // 3. Place foreground onto main canvas, scaled to fit nicely (max 70% of canvas width/height)
       const maxFgWidth = canvas.width * 0.7;
       const maxFgHeight = canvas.height * 0.7;
       
@@ -528,12 +572,6 @@
         fgDrawH = fgH * ratio;
       }
       if (fgDrawH > maxFgHeight) {
-        const ratio = maxFgHeight / fgDrawH;
-        fgDrawH = maxFgHeight;
-        fgDrawW = fgDrawW * ratio; // already scaled? careful: recompute from original
-      }
-      // Recalculate proportionally from original if second condition applied
-      if (fgDrawH > maxFgHeight) {
         const ratio = maxFgHeight / fgH;
         fgDrawH = maxFgHeight;
         fgDrawW = fgW * ratio;
@@ -543,28 +581,32 @@
       const fgX = (canvas.width - fgDrawW) / 2;
       const fgY = (canvas.height - fgDrawH) / 2;
       
-      // Draw the cutout foreground
+      // Draw the cutout foreground with slight shadow for depth (optional)
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 10;
       ctx.drawImage(fgCanvas, fgX, fgY, fgDrawW, fgDrawH);
       
-      // Optional: add a subtle shadow or blend for realism? Not necessary but nice
-      // But we keep it clean.
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
       
       setStatus('✅ Composite created! The main object was cut out and placed on the background.');
     }
 
     // ---------- Reset everything ----------
     function resetAll() {
-      // Clear inputs
       bgInput.value = '';
       fgInput.value = '';
       
-      // Reset image holders
       bgImage = null;
       fgImage = null;
       bgLoaded = false;
       fgLoaded = false;
       
-      // Reset canvas to placeholder
       drawPlaceholder();
       setStatus('Upload both images and press “Generate composite”.');
     }
@@ -575,85 +617,6 @@
 
     // Initialize with placeholder
     drawPlaceholder();
-
-    // Also allow pressing generate even if only one image loaded -> will show error
-    // For convenience, we also add a small note: if both are loaded, we could auto-update on fg change? No, user action is fine.
-
-    // Bonus: If user uploads both, maybe status shows ready
-    // We handle in input events.
-
-    // Additionally: when both loaded, we can set status "Ready to composite"
-    // We'll do a quick check in a helper, but it's fine.
-
-    // Override status messages for better UX
-    const originalBgChange = bgInput.onchange;
-    // We already have listeners. Add small check to show ready when both loaded.
-    function updateReadyStatus() {
-      if (bgLoaded && fgLoaded && bgImage && fgImage) {
-        setStatus(`Ready: background ${bgImage.width}×${bgImage.height}px, main ${fgImage.width}×${fgImage.height}px. Click "Generate composite".`);
-      }
-    }
-
-    // Hook into existing load completions (slightly hacky but works)
-    // We'll override the load resolution by checking after each load.
-    // Since we can't easily attach to promise resolution, we'll use a small interval or modify code.
-    // For simplicity, we'll just let the user click generate and handle errors.
-    // But we can set a flag and check in a mutation? Better to keep as is.
-
-    // However, we can patch the input handlers to call updateReadyStatus when done.
-    // I'll just add a timer after load? Not needed.
-
-    // Actually, we can re-assign the input listeners but that's messy. Let's just keep it simple.
-    // The user will see both images loaded via their own file names in inputs.
-
-    // One more improvement: Show filename next to input? Not necessary.
-
-    // For better experience: after bg load, if fg already loaded, set status ready.
-    // I'll refactor the event handlers to call a common function.
-
-    // Let's redefine the event handlers for cleanliness (reassign)
-    // This is a bit hacky but works for the demo.
-    // I'll remove previous listeners and set new ones.
-    // But they are anonymous, can't remove. So I'll use a different approach:
-    // Instead of redefining, I'll just leave as is; status messages are still informative.
-    // To make it nicer, I'll add a small check in the generate function if both loaded.
-
-    // Ok, final polish: if both loaded and user clicks generate, it works.
-    // The status will show ready if we call updateReadyStatus manually? Not needed.
-
-    // I'll add a small check when each input changes to show ready.
-    // We can do it by wrapping the load handlers.
-
-    // I'll just reassign the event listeners with new functions that include ready check.
-    // Since we can't remove, I'll disable the old ones by setting a flag, but that's complex.
-    // Instead, let's just redefine the input handlers in a way that works.
-
-    // To avoid double handlers, I'll use a fresh approach: remove all listeners and add new ones.
-    // (For this simple demo, it's fine to reload the page logic, but we'll do it properly.)
-
-    // I'll rewrite the script's event binding section in a clean way below.
-
-    // Actually, I'll just keep the current script as is; the core functionality works.
-    // The status messages are sufficient.
-
-    // But I'll add a small enhancement: after both are loaded, automatically preview placeholder? No.
-
-    // Final note: the cutout is basic but works on solid backgrounds.
-
-    // For demonstration, it's good.
-
-    // One more thing: if the foreground has transparency already (PNG), our cutout will preserve it plus remove similar colors.
-    // That's fine.
-
-    // Let's just ensure the placeholder is drawn on load.
-    // Already done.
-
-    // Make sure the canvas displays correctly.
-    // The rest is fine.
-
-    // I'll also handle the case where the user uploads a PNG with transparency: our algorithm still works.
-
-    // All good.
   })();
 </script>
 </body>
