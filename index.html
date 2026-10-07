@@ -3,222 +3,446 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mulanga's Studio</title>
+<title>Mulanga's Studio — Automotive Ad Creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bebas+Neue&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: #0a0a0c;
-    min-height: 100vh;
-    margin: 0;
-    padding: 24px;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #08080a;
     color: #e8e6e3;
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+      radial-gradient(ellipse at top, rgba(255,179,71,0.04), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(231,76,60,0.03), transparent 60%);
   }
-  .app {
-    max-width: 1500px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 24px;
-  }
-  @media (max-width: 1100px) { .app { grid-template-columns: 1fr; } }
 
-  .brand { grid-column: 1 / -1; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; }
-  .brand h1 { font-size: 1.9rem; font-weight: 300; letter-spacing: -0.02em; margin: 0 0 4px 0; color: #fff; }
-  .brand h1 span {
-    background: linear-gradient(135deg, #ffb347, #ff7e5f);
+  /* ================= HEADER ================= */
+  .topbar {
+    max-width: 1600px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px;
+    background: rgba(19,19,22,0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-mark {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #ffb347, #ff7e5f, #e74c3c);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px; color: #1a1a1f;
+    box-shadow: 0 8px 20px -6px rgba(255,126,95,0.5);
+  }
+  .logo-text h1 {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff, #b8b8c0);
     -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; font-weight: 700;
+    -webkit-text-fill-color: transparent;
   }
-  .brand p { margin: 0; font-size: 0.85rem; color: #6b6b72; }
+  .logo-text p { font-size: 0.68rem; color: #6b6b72; letter-spacing: 0.15em; text-transform: uppercase; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 30px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.72rem; color: #9a9aa0;
+  }
+  .pill .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #2ecc71;
+    box-shadow: 0 0 8px #2ecc71;
+    animation: livePulse 2s infinite;
+  }
+  @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+  /* ================= LAYOUT ================= */
+  .app {
+    max-width: 1600px; margin: 0 auto;
+    display: grid; grid-template-columns: 400px 1fr; gap: 20px;
+  }
+  @media (max-width: 1150px) { .app { grid-template-columns: 1fr; } }
+
+  /* ================= SIDEBAR ================= */
   .sidebar {
-    background: #131316; border-radius: 20px; padding: 22px;
-    border: 1px solid rgba(255,255,255,0.04); height: fit-content;
+    background: rgba(19,19,22,0.9);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 22px;
+    height: fit-content;
+    position: sticky; top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
   }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
 
-  .label {
-    font-size: 0.68rem; font-weight: 600; color: #6b6b72;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    margin: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center;
+  .step {
+    display: flex; align-items: center; gap: 10px;
+    margin: 24px 0 12px;
   }
-  .label .badge {
-    background: #1f1f24; color: #6b6b72; font-size: 0.6rem;
-    padding: 3px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase;
+  .step:first-child { margin-top: 0; }
+  .step .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #ffb347, #ff7e5f);
+    color: #1a1a1f; font-weight: 800; font-size: 0.7rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  .label .badge.ok { background: rgba(46,204,113,0.15); color: #2ecc71; }
+  .step .title { font-size: 0.72rem; font-weight: 600; color: #e8e6e3; letter-spacing: 0.05em; text-transform: uppercase; }
 
   .file-zone {
-    display: block; background: #1a1a1f; border: 1.5px dashed rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 16px; margin-bottom: 18px; cursor: pointer;
-    transition: all 0.2s; text-align: center; position: relative;
+    display: block; position: relative;
+    background: linear-gradient(135deg, #16161a, #101014);
+    border: 1.5px dashed rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 18px 14px;
+    cursor: pointer; transition: all 0.2s;
+    overflow: hidden;
   }
-  .file-zone:hover { border-color: rgba(255,179,71,0.5); }
-  .file-zone.has { border-style: solid; border-color: #2ecc71; }
-  .file-zone .icon { font-size: 1.4rem; margin-bottom: 4px; }
-  .file-zone .t1 { font-size: 0.82rem; font-weight: 500; color: #e8e6e3; }
-  .file-zone .t2 { font-size: 0.7rem; color: #6b6b72; margin-top: 2px; }
+  .file-zone:hover { border-color: rgba(255,179,71,0.6); background: linear-gradient(135deg, #1a1a1f, #14141a); }
+  .file-zone.has {
+    border-style: solid; border-color: #2ecc71;
+    background: linear-gradient(135deg, rgba(46,204,113,0.06), rgba(46,204,113,0.02));
+  }
   .file-zone input { display: none; }
-  .file-zone img { display: none; width: 100%; height: 60px; object-fit: cover; border-radius: 8px; margin-top: 8px; }
-  .file-zone.has img { display: block; }
-  .file-zone.has .icon { display: none; }
+  .fz-content { display: flex; align-items: center; gap: 12px; }
+  .fz-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: rgba(255,179,71,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .file-zone.has .fz-icon { background: rgba(46,204,113,0.15); }
+  .fz-text { flex: 1; min-width: 0; }
+  .fz-text .t1 { font-size: 0.82rem; font-weight: 600; color: #e8e6e3; margin-bottom: 2px; }
+  .fz-text .t2 { font-size: 0.7rem; color: #6b6b72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fz-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #2ecc71; color: #fff;
+    display: none; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900;
+  }
+  .file-zone.has .fz-check { display: flex; }
+  .fz-thumb {
+    display: none; width: 100%; height: 70px; object-fit: cover;
+    border-radius: 8px; margin-top: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .file-zone.has .fz-thumb { display: block; }
 
-  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+  /* ---- Style tabs ---- */
+  .tabs {
+    display: flex; gap: 4px;
+    background: #0e0e12;
+    padding: 4px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 12px;
+  }
+  .tab {
+    flex: 1; padding: 8px 6px; text-align: center;
+    font-size: 0.7rem; font-weight: 600; color: #6b6b72;
+    border-radius: 7px; cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.03em;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, #ffb347, #ff7e5f);
+    color: #1a1a1f;
+    box-shadow: 0 4px 12px -3px rgba(255,126,95,0.5);
+  }
+
+  /* ---- Preset chips ---- */
+  .preset-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
   .preset {
-    background: #1a1a1f; border: 1.5px solid rgba(255,255,255,0.06);
-    border-radius: 10px; padding: 10px 8px; text-align: center;
-    cursor: pointer; transition: all 0.15s; font-size: 0.72rem; color: #9a9aa0;
+    position: relative; overflow: hidden;
+    background: #16161a;
+    border: 1.5px solid rgba(255,255,255,0.05);
+    border-radius: 10px; padding: 10px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; flex-direction: column; gap: 6px;
   }
-  .preset .sw { width: 100%; height: 22px; border-radius: 5px; margin-bottom: 5px; }
-  .preset:hover { border-color: rgba(255,179,71,0.4); color: #e8e6e3; }
+  .preset .sw {
+    height: 26px; border-radius: 6px;
+    position: relative; overflow: hidden;
+  }
+  .preset .sw::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15));
+  }
+  .preset .name { font-size: 0.7rem; font-weight: 600; color: #9a9aa0; }
+  .preset:hover { border-color: rgba(255,179,71,0.4); }
+  .preset:hover .name { color: #e8e6e3; }
   .preset.active {
-    border-color: #ffb347; color: #ffb347; font-weight: 600;
-    background: rgba(255,179,71,0.08);
+    border-color: #ffb347;
+    background: rgba(255,179,71,0.06);
   }
+  .preset.active .name { color: #ffb347; }
 
-  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .slider-row label { font-size: 0.72rem; color: #9a9aa0; width: 90px; flex-shrink: 0; }
+  /* ---- Sliders ---- */
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .slider-row label {
+    font-size: 0.7rem; color: #9a9aa0; width: 85px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 5px;
+  }
   .slider-row input[type="range"] {
-    flex: 1; -webkit-appearance: none; height: 3px;
-    background: #2a2a30; border-radius: 3px; outline: none;
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 3px; background: #2a2a30; border-radius: 3px; outline: none;
   }
   .slider-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none; width: 14px; height: 14px;
-    background: #ffb347; border-radius: 50%; cursor: pointer;
-    box-shadow: 0 0 0 4px rgba(255,179,71,0.15);
+    background: linear-gradient(135deg, #ffb347, #ff7e5f);
+    border-radius: 50%; cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(255,179,71,0.12);
+    transition: box-shadow 0.2s;
+  }
+  .slider-row input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 6px rgba(255,179,71,0.2);
   }
   .slider-row input[type="range"]::-moz-range-thumb {
-    width: 14px; height: 14px; background: #ffb347;
+    width: 14px; height: 14px;
+    background: linear-gradient(135deg, #ffb347, #ff7e5f);
     border-radius: 50%; cursor: pointer; border: none;
   }
-  .slider-row .v { font-size: 0.7rem; color: #6b6b72; width: 42px; text-align: right; }
+  .slider-row .v {
+    font-size: 0.68rem; color: #6b6b72; width: 40px; text-align: right;
+    font-variant-numeric: tabular-nums; font-weight: 500;
+  }
 
+  /* ---- Buttons ---- */
   .btn {
-    width: 100%; padding: 13px; border-radius: 11px; border: none;
-    font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    transition: all 0.15s; margin-bottom: 8px;
+    width: 100%; padding: 13px; border-radius: 11px;
+    border: none; font-size: 0.84rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: inherit;
   }
   .btn-primary {
-    background: linear-gradient(135deg, #ffb347, #ff7e5f); color: #1a1a1f;
-    box-shadow: 0 8px 24px -6px rgba(255,126,95,0.5);
+    background: linear-gradient(135deg, #ffb347, #ff7e5f, #e74c3c);
+    color: #fff;
+    box-shadow: 0 10px 25px -6px rgba(255,126,95,0.5);
   }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 30px -6px rgba(255,126,95,0.6); }
   .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn-ghost { background: #1a1a1f; color: #9a9aa0; border: 1px solid rgba(255,255,255,0.06); }
-  .btn-ghost:hover:not(:disabled) { background: #222228; color: #e8e6e3; }
+  .btn-ghost {
+    background: #16161a; color: #9a9aa0;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .btn-ghost:hover:not(:disabled) { background: #1d1d23; color: #e8e6e3; }
   .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  /* ================= STAGE ================= */
   .stage {
-    background: #131316; border-radius: 20px; padding: 18px;
-    border: 1px solid rgba(255,255,255,0.04);
-    display: flex; flex-direction: column; gap: 12px; min-height: 620px;
+    background: rgba(19,19,22,0.9);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 14px;
+    min-height: 700px;
   }
   .canvas-wrap {
     flex: 1; display: flex; align-items: center; justify-content: center;
-    background: #000; border-radius: 14px; overflow: hidden; min-height: 520px;
+    background:
+      radial-gradient(circle at center, #131318 0%, #050507 100%);
+    border-radius: 14px; overflow: hidden;
+    min-height: 600px;
+    position: relative;
   }
-  canvas { max-width: 100%; max-height: 72vh; display: block; border-radius: 12px; }
+  .canvas-wrap::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  canvas {
+    max-width: 100%; max-height: 74vh; display: block;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.9);
+    z-index: 1;
+  }
+  .stage-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6px;
+  }
   .status {
     display: flex; align-items: center; gap: 8px;
-    font-size: 0.78rem; color: #6b6b72; padding: 0 4px;
+    font-size: 0.76rem; color: #6b6b72;
   }
-  .status .dot { width: 7px; height: 7px; border-radius: 50%; background: #6b6b72; transition: background 0.2s; }
-  .status.working .dot { background: #ffb347; animation: pulse 1.2s infinite; }
-  .status.done .dot { background: #2ecc71; }
-  .status.error .dot { background: #e74c3c; }
+  .status .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #6b6b72;
+    transition: all 0.2s;
+  }
+  .status.working .dot {
+    background: #ffb347; box-shadow: 0 0 10px #ffb347;
+    animation: pulse 1.2s infinite;
+  }
+  .status.done .dot { background: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+  .status.error .dot { background: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  .progress { height: 3px; background: #1a1a1f; border-radius: 3px; overflow: hidden; display: none; }
+  .dims { font-size: 0.7rem; color: #4a4a52; font-variant-numeric: tabular-nums; }
+
+  .progress {
+    height: 2px; background: #1a1a1f; border-radius: 2px;
+    overflow: hidden; display: none;
+  }
   .progress.on { display: block; }
-  .progress-inner { height: 100%; background: linear-gradient(90deg, #ffb347, #ff7e5f); width: 0%; transition: width 0.3s; }
+  .progress-inner {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #ffb347, #ff7e5f, #e74c3c);
+    transition: width 0.3s;
+    box-shadow: 0 0 10px rgba(255,126,95,0.5);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(135deg, #1f1f24, #16161a);
+    border: 1px solid rgba(255,179,71,0.3);
+    color: #e8e6e3; padding: 14px 24px; border-radius: 12px;
+    font-size: 0.82rem; font-weight: 500;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100; display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="brand">
-    <h1>Mulanga's <span>Studio</span></h1>
-    <p>Photorealistic composite engine.</p>
+
+<!-- ================= TOPBAR ================= -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">M</div>
+    <div class="logo-text">
+      <h1>Mulanga's Studio</h1>
+      <p>Automotive Ad Creator</p>
+    </div>
   </div>
+  <div class="topbar-actions">
+    <div class="pill"><span class="live-dot"></span> Engine Ready</div>
+  </div>
+</div>
 
+<div class="app">
+  <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar">
-    <div class="label">Background <span class="badge" id="bgBadge">empty</span></div>
+
+    <div class="step"><span class="num">1</span><span class="title">Background Scene</span></div>
     <label class="file-zone" id="bgZone">
-      <div class="icon">🏞️</div>
-      <div class="t1">Choose background</div>
-      <div class="t2">Road · city · beach · studio</div>
-      <img id="bgThumb" alt="">
       <input type="file" id="bgInput" accept="image/*">
+      <div class="fz-content">
+        <div class="fz-icon">🏙️</div>
+        <div class="fz-text">
+          <div class="t1">Choose background</div>
+          <div class="t2" id="bgName">City · road · beach · studio</div>
+        </div>
+        <div class="fz-check">✓</div>
+      </div>
+      <img class="fz-thumb" id="bgThumb" alt="">
     </label>
 
-    <div class="label">Subject (Car) <span class="badge" id="fgBadge">empty</span></div>
+    <div class="step"><span class="num">2</span><span class="title">Vehicle Subject</span></div>
     <label class="file-zone" id="fgZone">
-      <div class="icon">🚗</div>
-      <div class="t1">Choose car photo</div>
-      <div class="t2">Clean side or 3/4 view</div>
-      <img id="fgThumb" alt="">
       <input type="file" id="fgInput" accept="image/*">
+      <div class="fz-content">
+        <div class="fz-icon">🚗</div>
+        <div class="fz-text">
+          <div class="t1">Choose vehicle photo</div>
+          <div class="t2" id="fgName">Side · 3/4 · front view</div>
+        </div>
+        <div class="fz-check">✓</div>
+      </div>
+      <img class="fz-thumb" id="fgThumb" alt="">
     </label>
 
-    <div class="label">Scene Lighting</div>
-    <div class="preset-grid" id="presetGrid">
-      <div class="preset active" data-preset="auto"><div class="sw" style="background:linear-gradient(135deg,#888,#bbb)"></div>Auto Match</div>
-      <div class="preset" data-preset="golden"><div class="sw" style="background:linear-gradient(135deg,#ffb347,#ff7e5f)"></div>Golden Hour</div>
-      <div class="preset" data-preset="overcast"><div class="sw" style="background:linear-gradient(135deg,#b8c4d0,#e8eef5)"></div>Overcast</div>
-      <div class="preset" data-preset="night"><div class="sw" style="background:linear-gradient(135deg,#1a2a4a,#0a0a1a)"></div>Night</div>
-      <div class="preset" data-preset="studio"><div class="sw" style="background:linear-gradient(135deg,#f0f0f0,#c0c0c0)"></div>Studio</div>
-      <div class="preset" data-preset="dramatic"><div class="sw" style="background:linear-gradient(135deg,#e67e22,#8b1a1a)"></div>Dramatic</div>
+    <div class="step"><span class="num">3</span><span class="title">Ad Format</span></div>
+    <div class="tabs" id="formatTabs">
+      <div class="tab active" data-format="poster">Poster</div>
+      <div class="tab" data-format="billboard">Billboard</div>
+      <div class="tab" data-format="social">Social</div>
+      <div class="tab" data-format="magazine">Magazine</div>
     </div>
 
-    <div class="label">Fine Tune</div>
-    <div class="slider-row"><label>Subject size</label><input type="range" id="size" min="25" max="100" value="62"><span class="v" id="sizeV">62%</span></div>
-    <div class="slider-row"><label>Vertical pos</label><input type="range" id="posY" min="0" max="100" value="70"><span class="v" id="posYV">70%</span></div>
-    <div class="slider-row"><label>Shadow</label><input type="range" id="shadow" min="0" max="100" value="55"><span class="v" id="shadowV">55%</span></div>
-    <div class="slider-row"><label>Light blend</label><input type="range" id="blend" min="0" max="100" value="40"><span class="v" id="blendV">40%</span></div>
+    <div class="step"><span class="num">4</span><span class="title">Scene Mood</span></div>
+    <div class="preset-grid" id="presetGrid">
+      <div class="preset active" data-preset="auto"><div class="sw" style="background:linear-gradient(135deg,#7d8a99,#c8d2dc)"></div><div class="name">Auto Match</div></div>
+      <div class="preset" data-preset="golden"><div class="sw" style="background:linear-gradient(135deg,#ffd89b,#ff7e5f,#e74c3c)"></div><div class="name">Golden Hour</div></div>
+      <div class="preset" data-preset="overcast"><div class="sw" style="background:linear-gradient(135deg,#b8c4d0,#8b96a5,#5a6a7a)"></div><div class="name">Overcast</div></div>
+      <div class="preset" data-preset="night"><div class="sw" style="background:linear-gradient(135deg,#2c3e5c,#141a2e,#08080f)"></div><div class="name">Night City</div></div>
+      <div class="preset" data-preset="studio"><div class="sw" style="background:linear-gradient(135deg,#f5f5f5,#c8c8c8,#8a8a8a)"></div><div class="name">Studio</div></div>
+      <div class="preset" data-preset="dramatic"><div class="sw" style="background:linear-gradient(135deg,#e67e22,#8b1a1a,#2c0a0a)"></div><div class="name">Dramatic</div></div>
+    </div>
+
+    <div class="step"><span class="num">5</span><span class="title">Fine Tune</span></div>
+    <div class="slider-row"><label>Size</label><input type="range" id="size" min="25" max="100" value="65"><span class="v" id="sizeV">65%</span></div>
+    <div class="slider-row"><label>Position</label><input type="range" id="posY" min="0" max="100" value="72"><span class="v" id="posYV">72%</span></div>
+    <div class="slider-row"><label>Shadow</label><input type="range" id="shadow" min="0" max="100" value="60"><span class="v" id="shadowV">60%</span></div>
+    <div class="slider-row"><label>Blend</label><input type="range" id="blend" min="0" max="100" value="45"><span class="v" id="blendV">45%</span></div>
     <div class="slider-row"><label>Warmth</label><input type="range" id="warm" min="-50" max="50" value="0"><span class="v" id="warmV">0</span></div>
 
-    <button class="btn btn-primary" id="renderBtn" disabled>Render Composite</button>
-    <button class="btn btn-ghost" id="downloadBtn" disabled>Download PNG</button>
-    <button class="btn btn-ghost" id="resetBtn">Reset</button>
+    <button class="btn btn-primary" id="renderBtn" disabled>⚡ Generate Ad</button>
+    <button class="btn btn-ghost" id="downloadBtn" disabled>⬇ Download PNG</button>
+    <button class="btn btn-ghost" id="resetBtn">↺ Reset</button>
   </aside>
 
+  <!-- ================= STAGE ================= -->
   <main class="stage">
-    <div class="canvas-wrap"><canvas id="canvas" width="1400" height="900"></canvas></div>
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="1400" height="900"></canvas>
+    </div>
     <div class="progress" id="progress"><div class="progress-inner" id="progressInner"></div></div>
-    <div class="status" id="status"><span class="dot"></span><span id="statusText">Upload both images to begin.</span></div>
+    <div class="stage-meta">
+      <div class="status" id="status"><span class="dot"></span><span id="statusText">Upload both images to begin.</span></div>
+      <div class="dims" id="dims">—</div>
+    </div>
   </main>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 (function() {
   'use strict';
 
-  /* ============================================================
-     STATE
-     ============================================================ */
+  /* ============ STATE ============ */
   var S = {
     bg: null, fg: null, cutout: null,
     bgReady: false, fgReady: false, cutoutReady: false,
+    format: 'poster',
     preset: 'auto',
-    sizePct: 62, posYPct: 70, shadowAmt: 55, blendAmt: 40, warmth: 0,
+    sizePct: 65, posYPct: 72, shadowAmt: 60, blendAmt: 45, warmth: 0,
     processing: false, lastPNG: null,
     scene: { r: 200, g: 200, b: 200, keyAngle: -45 }
   };
 
-  /* ============================================================
-     DOM
-     ============================================================ */
+  /* ============ DOM ============ */
   function $(id) { return document.getElementById(id); }
   var bgInput = $('bgInput'), fgInput = $('fgInput');
   var bgZone = $('bgZone'), fgZone = $('fgZone');
   var bgThumb = $('bgThumb'), fgThumb = $('fgThumb');
-  var bgBadge = $('bgBadge'), fgBadge = $('fgBadge');
+  var bgName = $('bgName'), fgName = $('fgName');
   var renderBtn = $('renderBtn'), downloadBtn = $('downloadBtn'), resetBtn = $('resetBtn');
   var canvas = $('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
   var statusEl = $('status'), statusText = $('statusText');
+  var dimsEl = $('dims');
   var progressEl = $('progress'), progressInner = $('progressInner');
+  var toastEl = $('toast');
 
-  /* ============================================================
-     UI
-     ============================================================ */
+  /* ============ UI ============ */
   function setStatus(text, kind) {
     statusText.textContent = text;
     statusEl.className = 'status' + (kind ? ' ' + kind : '');
@@ -236,59 +460,53 @@
     renderBtn.disabled = !(S.bgReady && S.cutoutReady) || S.processing;
     downloadBtn.disabled = !S.lastPNG;
   }
-
-  /* ============================================================
-     IMAGE LOADING
-     ============================================================ */
-  function loadImageFromFile(file) {
-    return new Promise(function(resolve, reject) {
-      if (!file || !file.type || file.type.indexOf('image/') !== 0) {
-        reject(new Error('Not a valid image file'));
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var img = new Image();
-        img.onload = function() { resolve(img); };
-        img.onerror = function() { reject(new Error('Image decode failed')); };
-        img.src = e.target.result;
-      };
-      reader.onerror = function() { reject(new Error('File read failed')); };
-      reader.readAsDataURL(file);
-    });
+  var toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, 2400);
   }
 
-  function imageFromDataURL(dataURL) {
+  /* ============ IMAGE UTILS ============ */
+  function loadImageFromFile(file) {
+    return new Promise(function(resolve, reject) {
+      if (!file || !file.type || file.type.indexOf('image/') !== 0) return reject(new Error('Not an image'));
+      var r = new FileReader();
+      r.onload = function(e) {
+        var img = new Image();
+        img.onload = function() { resolve(img); };
+        img.onerror = function() { reject(new Error('Decode failed')); };
+        img.src = e.target.result;
+      };
+      r.onerror = function() { reject(new Error('Read failed')); };
+      r.readAsDataURL(file);
+    });
+  }
+  function imageFromDataURL(url) {
     return new Promise(function(resolve, reject) {
       var img = new Image();
       img.onload = function() { resolve(img); };
       img.onerror = function() { reject(new Error('DataURL load failed')); };
-      img.src = dataURL;
+      img.src = url;
     });
   }
 
-  /* ============================================================
-     FAST BUILT-IN CUTOUT (always works)
-     Uses color-distance from corner samples + edge feathering.
-     ============================================================ */
+  /* ============ CUTOUT ============ */
   function fastCutout(img) {
     var maxDim = 1400;
     var w = img.width, h = img.height;
     if (Math.max(w, h) > maxDim) {
       var s = maxDim / Math.max(w, h);
-      w = Math.round(w * s);
-      h = Math.round(h * s);
+      w = Math.round(w * s); h = Math.round(h * s);
     }
-
     var c = document.createElement('canvas');
     c.width = w; c.height = h;
     var cx = c.getContext('2d', { willReadFrequently: true });
     cx.drawImage(img, 0, 0, w, h);
-
     var id = cx.getImageData(0, 0, w, h);
     var px = id.data;
 
-    // Sample background from 12 points: 4 corners, 4 edge midpoints, 4 near corners
     var pts = [
       [0,0],[w-1,0],[0,h-1],[w-1,h-1],
       [Math.floor(w/2),0],[Math.floor(w/2),h-1],
@@ -305,44 +523,30 @@
     }
     r0 /= pts.length; g0 /= pts.length; b0 /= pts.length;
 
-    // Multi-threshold: pixels close to bg color become transparent
     var hard = 50, feather = 40;
     for (var i = 0; i < px.length; i += 4) {
       var dr = px[i] - r0, dg = px[i+1] - g0, db = px[i+2] - b0;
       var dist = Math.sqrt(dr*dr + dg*dg + db*db);
-      if (dist < hard) {
-        px[i+3] = 0;
-      } else if (dist < hard + feather) {
-        px[i+3] = Math.round(px[i+3] * (dist - hard) / feather);
-      }
+      if (dist < hard) px[i+3] = 0;
+      else if (dist < hard + feather) px[i+3] = Math.round(px[i+3] * (dist - hard) / feather);
     }
-
-    // Clean up isolated noise: single-pass median-like filter on alpha
     var alphaCopy = new Uint8ClampedArray(w * h);
     for (var j = 0; j < w * h; j++) alphaCopy[j] = px[j * 4 + 3];
     for (var y = 1; y < h - 1; y++) {
       for (var x = 1; x < w - 1; x++) {
-        var idx = y * w + x;
-        var sum = 0;
-        for (var dy = -1; dy <= 1; dy++) {
-          for (var dx = -1; dx <= 1; dx++) {
+        var idx = y * w + x, sum = 0;
+        for (var dy = -1; dy <= 1; dy++)
+          for (var dx = -1; dx <= 1; dx++)
             sum += alphaCopy[(y + dy) * w + (x + dx)];
-          }
-        }
         var avg = sum / 9;
-        // Sharpen: if a pixel's alpha is far from its neighborhood, pull it toward the average
-        var orig = px[idx * 4 + 3];
-        px[idx * 4 + 3] = Math.round(orig * 0.35 + avg * 0.65);
+        px[idx * 4 + 3] = Math.round(px[idx * 4 + 3] * 0.35 + avg * 0.65);
       }
     }
-
     cx.putImageData(id, 0, 0);
     return imageFromDataURL(c.toDataURL('image/png'));
   }
 
-  /* ============================================================
-     SCENE ANALYSIS
-     ============================================================ */
+  /* ============ SCENE ANALYSIS ============ */
   function analyzeScene(img) {
     var w = 80, h = 80;
     var c = document.createElement('canvas');
@@ -350,38 +554,30 @@
     var cx = c.getContext('2d');
     cx.drawImage(img, 0, 0, w, h);
     var d = cx.getImageData(0, 0, w, h).data;
-
-    var rS = 0, gS = 0, bS = 0, lS = 0;
+    var rS = 0, gS = 0, bS = 0;
     var topL = 0, topN = 0, botL = 0, botN = 0, leftL = 0, leftN = 0, rightL = 0, rightN = 0;
     var n = w * h;
-
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++) {
         var i = (y * w + x) * 4;
         var r = d[i], g = d[i+1], b = d[i+2];
         var lum = 0.299 * r + 0.587 * g + 0.114 * b;
-        rS += r; gS += g; bS += b; lS += lum;
+        rS += r; gS += g; bS += b;
         if (y < h/3) { topL += lum; topN++; }
         if (y > 2*h/3) { botL += lum; botN++; }
         if (x < w/3) { leftL += lum; leftN++; }
         if (x > 2*w/3) { rightL += lum; rightN++; }
       }
     }
-    var avgR = rS / n, avgG = gS / n, avgB = bS / n;
     var top = topL/topN, bot = botL/botN, left = leftL/leftN, right = rightL/rightN;
     var quads = [
-      { v: (top+left)/2, a: -135 },
-      { v: (top+right)/2, a: -45 },
-      { v: (bot+left)/2, a: 135 },
-      { v: (bot+right)/2, a: 45 }
+      { v: (top+left)/2, a: -135 }, { v: (top+right)/2, a: -45 },
+      { v: (bot+left)/2, a: 135 }, { v: (bot+right)/2, a: 45 }
     ].sort(function(a,b) { return b.v - a.v; });
-
-    return { r: avgR, g: avgG, b: avgB, keyAngle: quads[0].a };
+    return { r: rS/n, g: gS/n, b: bS/n, keyAngle: quads[0].a };
   }
 
-  /* ============================================================
-     RELIGHTING
-     ============================================================ */
+  /* ============ RELIGHT ============ */
   function relight(cutout, scene) {
     var c = document.createElement('canvas');
     c.width = cutout.width; c.height = cutout.height;
@@ -391,7 +587,6 @@
     var px = id.data;
 
     var tR = scene.r, tG = scene.g, tB = scene.b, bright = 1.0, keyA = scene.keyAngle;
-
     switch (S.preset) {
       case 'golden':   tR=255; tG=195; tB=130; bright=1.10; keyA=-55; break;
       case 'overcast': tR=205; tG=215; tB=228; bright=0.92; keyA=-90; break;
@@ -399,7 +594,6 @@
       case 'studio':   tR=245; tG=245; tB=245; bright=1.00; keyA=-45; break;
       case 'dramatic': tR=210; tG=140; tB=85;  bright=0.82; keyA=-120; break;
     }
-
     var tint = (S.preset === 'auto' ? 0.35 : 0.55) * (S.blendAmt / 100 + 0.35);
     var rad = (keyA * Math.PI) / 180;
     var lx = Math.cos(rad), ly = Math.sin(rad);
@@ -409,31 +603,22 @@
       for (var x = 0; x < w; x++) {
         var i = (y * w + x) * 4;
         if (px[i+3] === 0) continue;
-
-        var nx = (x / w) - 0.5, ny = (y / h) - 0.5;
-        var facing = (nx * lx + ny * ly) + 0.5;
+        var nx = (x/w) - 0.5, ny = (y/h) - 0.5;
+        var facing = (nx*lx + ny*ly) + 0.5;
         var shade = 0.62 + facing * 0.58;
-
-        var r = px[i] * shade;
-        var g = px[i+1] * shade;
-        var b = px[i+2] * shade;
-
-        r = r * (1 - tint) + tR * tint * (r / 255);
-        g = g * (1 - tint) + tG * tint * (g / 255);
-        b = b * (1 - tint) + tB * tint * (b / 255);
-
+        var r = px[i]*shade, g = px[i+1]*shade, b = px[i+2]*shade;
+        r = r*(1-tint) + tR*tint*(r/255);
+        g = g*(1-tint) + tG*tint*(g/255);
+        b = b*(1-tint) + tB*tint*(b/255);
         r *= bright; g *= bright; b *= bright;
-
         var wm = S.warmth / 100;
-        r *= (1 + wm * 0.45);
-        g *= (1 + wm * 0.10);
-        b *= (1 - wm * 0.45);
-
+        r *= (1 + wm*0.45);
+        g *= (1 + wm*0.10);
+        b *= (1 - wm*0.45);
         var con = 1.09;
         r = ((r/255 - 0.5) * con + 0.5) * 255;
         g = ((g/255 - 0.5) * con + 0.5) * 255;
         b = ((b/255 - 0.5) * con + 0.5) * 255;
-
         px[i]   = Math.max(0, Math.min(255, r));
         px[i+1] = Math.max(0, Math.min(255, g));
         px[i+2] = Math.max(0, Math.min(255, b));
@@ -443,9 +628,7 @@
     return imageFromDataURL(c.toDataURL('image/png'));
   }
 
-  /* ============================================================
-     SHADOW
-     ============================================================ */
+  /* ============ SHADOW ============ */
   function buildShadow(cutout, scene, opacity) {
     var c = document.createElement('canvas');
     c.width = cutout.width; c.height = cutout.height;
@@ -453,58 +636,181 @@
     cx.drawImage(cutout, 0, 0);
     var id = cx.getImageData(0, 0, c.width, c.height);
     var px = id.data;
-
     var shR = Math.round(scene.r * 0.22);
     var shG = Math.round(scene.g * 0.22);
     var shB = Math.round(scene.b * 0.22);
-
     for (var i = 0; i < px.length; i += 4) {
       if (px[i+3] === 0) continue;
-      px[i]   = shR;
-      px[i+1] = shG;
-      px[i+2] = shB;
+      px[i] = shR; px[i+1] = shG; px[i+2] = shB;
       px[i+3] = Math.round(px[i+3] * opacity);
     }
     cx.putImageData(id, 0, 0);
     return imageFromDataURL(c.toDataURL('image/png'));
   }
 
-  /* ============================================================
-     GRAIN
-     ============================================================ */
+  /* ============ GRAIN ============ */
   function addGrain(W, H, intensity) {
     var img = ctx.getImageData(0, 0, W, H);
     var d = img.data;
     var amt = intensity * 255;
     for (var i = 0; i < d.length; i += 4) {
       var n = (Math.random() - 0.5) * amt;
-      d[i]   = Math.max(0, Math.min(255, d[i]   + n));
+      d[i] = Math.max(0, Math.min(255, d[i] + n));
       d[i+1] = Math.max(0, Math.min(255, d[i+1] + n));
       d[i+2] = Math.max(0, Math.min(255, d[i+2] + n));
     }
     ctx.putImageData(img, 0, 0);
   }
 
-  /* ============================================================
-     DRAW COVER
-     ============================================================ */
-  function drawCover(img, W, H) {
-    var ir = img.width / img.height;
-    var cr = W / H;
+  /* ============ COVER ============ */
+  function drawCover(img, W, H, blur) {
+    var ir = img.width / img.height, cr = W / H;
     var dw, dh, ox, oy;
-    if (ir > cr) {
-      dh = H; dw = img.width * (H / img.height);
-      ox = (W - dw) / 2; oy = 0;
-    } else {
-      dw = W; dh = img.height * (W / img.width);
-      ox = 0; oy = (H - dh) / 2;
-    }
+    if (ir > cr) { dh = H; dw = img.width * (H / img.height); ox = (W - dw)/2; oy = 0; }
+    else { dw = W; dh = img.height * (W / img.width); ox = 0; oy = (H - dh)/2; }
+    ctx.save();
+    if (blur) ctx.filter = 'blur(' + blur + 'px)';
     ctx.drawImage(img, ox, oy, dw, dh);
+    ctx.restore();
   }
 
-  /* ============================================================
-     MAIN RENDER
-     ============================================================ */
+  /* ============ FORMAT PRESETS ============ */
+  function getFormatConfig(format) {
+    switch (format) {
+      case 'billboard': return { W: 1600, H: 900,  ratio: 16/9,  titleSize: 130, subSize: 24, tagline: 'DRIVE THE FUTURE', subline: 'Available Now · 2025 Edition', brand: 'MULANGA MOTORS' };
+      case 'social':    return { W: 1080, H: 1080, ratio: 1,     titleSize: 110, subSize: 22, tagline: 'GO BEYOND.', subline: 'New Season · New Drive', brand: 'MULANGA MOTORS' };
+      case 'magazine':  return { W: 1200, H: 1500, ratio: 4/5,   titleSize: 120, subSize: 24, tagline: 'PURE POWER', subline: 'The 2025 Collection', brand: 'MULANGA MOTORS' };
+      case 'poster':
+      default:          return { W: 1400, H: 900,  ratio: 14/9,  titleSize: 118, subSize: 22, tagline: 'BUILT TO THRILL', subline: 'Engineered for the Extraordinary', brand: 'MULANGA MOTORS' };
+    }
+  }
+
+  /* ============ TYPOGRAPHY ============ */
+  function drawAdCopy(W, H, scene) {
+    var cfg = getFormatConfig(S.format);
+    var isDarkBg = (scene.r * 0.299 + scene.g * 0.587 + scene.b * 0.114) < 140;
+    var ink = '#ffffff';
+    var accent = S.preset === 'golden' ? '#ffd89b' :
+                 S.preset === 'night' ? '#7ec8ff' :
+                 S.preset === 'studio' ? '#ffb347' :
+                 S.preset === 'dramatic' ? '#ffb347' :
+                 S.preset === 'overcast' ? '#e8eef5' : '#ffb347';
+
+    // --- Top-left corner accent bar ---
+    ctx.save();
+    ctx.fillStyle = accent;
+    ctx.fillRect(W * 0.04, H * 0.055, 44, 4);
+    ctx.restore();
+
+    // --- Brand tag (top-left) ---
+    ctx.save();
+    ctx.font = '800 13px Inter, sans-serif';
+    ctx.fillStyle = ink;
+    ctx.letterSpacing = '4px';
+    ctx.fillText(cfg.brand, W * 0.04, H * 0.09);
+    ctx.restore();
+
+    // --- Top-right meta ---
+    ctx.save();
+    ctx.font = '500 11px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.letterSpacing = '2px';
+    ctx.textAlign = 'right';
+    ctx.fillText('ISSUE 01 · 2025', W * 0.96, H * 0.09);
+    ctx.restore();
+
+    // --- Big title bottom-left (Bebas Neue for impact) ---
+    var titleFontSize = Math.round(cfg.titleSize * (W / 1400));
+    ctx.save();
+    ctx.font = '900 ' + titleFontSize + 'px "Bebas Neue", Impact, sans-serif';
+    ctx.fillStyle = ink;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 6;
+    ctx.textAlign = 'left';
+    ctx.letterSpacing = '-2px';
+
+    // Split tagline into words, break into 2 lines if long
+    var words = cfg.tagline.split(' ');
+    var line1 = '', line2 = '';
+    if (words.length > 2) {
+      line1 = words.slice(0, 2).join(' ');
+      line2 = words.slice(2).join(' ');
+    } else {
+      line1 = cfg.tagline;
+    }
+
+    var baseY = H - 130;
+    ctx.fillText(line1, W * 0.05, baseY);
+    if (line2) ctx.fillText(line2, W * 0.05, baseY + titleFontSize * 0.92);
+    ctx.restore();
+
+    // --- Accent underline ---
+    ctx.save();
+    var underlineY = baseY + (line2 ? titleFontSize * 1.9 : titleFontSize * 0.9);
+    var ulGrad = ctx.createLinearGradient(W * 0.05, 0, W * 0.05 + 140, 0);
+    ulGrad.addColorStop(0, accent);
+    ulGrad.addColorStop(1, 'rgba(255,126,95,0)');
+    ctx.fillStyle = ulGrad;
+    ctx.fillRect(W * 0.05, underlineY, 140, 3);
+    ctx.restore();
+
+    // --- Subline ---
+    ctx.save();
+    ctx.font = '500 ' + Math.round(cfg.subSize * (W / 1400)) + 'px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.letterSpacing = '3px';
+    ctx.textAlign = 'left';
+    ctx.fillText(cfg.subline.toUpperCase(), W * 0.05, underlineY + 34);
+    ctx.restore();
+
+    // --- CTA pill bottom-right ---
+    ctx.save();
+    var ctaW = 200, ctaH = 48;
+    var ctaX = W * 0.95 - ctaW, ctaY = H - 90;
+    // glow
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = 30;
+    var ctaGrad = ctx.createLinearGradient(ctaX, 0, ctaX + ctaW, 0);
+    ctaGrad.addColorStop(0, accent);
+    ctaGrad.addColorStop(1, '#ff7e5f');
+    ctx.fillStyle = ctaGrad;
+    roundRect(ctx, ctaX, ctaY, ctaW, ctaH, 24);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.fillStyle = '#1a1a1f';
+    ctx.font = '800 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '2px';
+    ctx.fillText('BOOK A TEST DRIVE', ctaX + ctaW/2, ctaY + ctaH/2 + 5);
+    ctx.restore();
+
+    // --- Bottom-left legal strip ---
+    ctx.save();
+    ctx.font = '400 10px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.letterSpacing = '1.5px';
+    ctx.textAlign = 'left';
+    ctx.fillText('TERMS APPLY · MODEL SHOWN MAY VARY · © MULANGA STUDIOS 2025', W * 0.05, H - 30);
+    ctx.restore();
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /* ============ RENDER ============ */
   function render() {
     if (!S.bgReady || !S.cutoutReady) return;
     S.processing = true;
@@ -516,94 +822,102 @@
       var scene = analyzeScene(S.bg);
       S.scene = scene;
 
-      setStatus('Relighting subject…', 'working');
-      setProgress(40);
-      var lit = S.cutout; // will be replaced async below
-
-      // Do the heavy work asynchronously via Promise chain
       relight(S.cutout, scene).then(function(litImg) {
         setStatus('Casting shadows…', 'working');
-        setProgress(65);
+        setProgress(50);
         var shadowOpacity = (S.shadowAmt / 100) * 0.85;
-        var shadowPromise = shadowOpacity > 0.02
-          ? buildShadow(litImg, scene, shadowOpacity)
-          : Promise.resolve(null);
+        return (shadowOpacity > 0.02 ? buildShadow(litImg, scene, shadowOpacity) : Promise.resolve(null))
+          .then(function(shadowImg) { return { lit: litImg, shadow: shadowImg }; });
+      }).then(function(res) {
+        setStatus('Designing layout…', 'working');
+        setProgress(75);
 
-        shadowPromise.then(function(shadowImg) {
-          setStatus('Compositing…', 'working');
-          setProgress(85);
+        var cfg = getFormatConfig(S.format);
+        // Preserve aspect while fitting background
+        var W = cfg.W, H = cfg.H;
+        canvas.width = W;
+        canvas.height = H;
 
-          // Canvas size
-          var maxW = 1400;
-          var W = S.bg.width, H = S.bg.height;
-          if (W > maxW) { H = Math.round(H * (maxW / W)); W = maxW; }
-          canvas.width = W;
-          canvas.height = H;
+        // Background
+        drawCover(S.bg, W, H);
+        // Slight darkening overlay for text legibility
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
 
-          drawCover(S.bg, W, H);
+        // Subject placement
+        var ar = res.lit.width / res.lit.height;
+        var sw = W * (S.sizePct / 100);
+        var sh = sw / ar;
+        var maxSH = H * 0.72;
+        if (sh > maxSH) { sh = maxSH; sw = sh * ar; }
+        var sx = (W - sw) / 2;
+        var sy = H * (S.posYPct / 100) - sh * 0.5;
 
-          var ar = litImg.width / litImg.height;
-          var sw = W * (S.sizePct / 100);
-          var sh = sw / ar;
-          var maxSH = H * 0.78;
-          if (sh > maxSH) { sh = maxSH; sw = sh * ar; }
-          var sx = (W - sw) / 2;
-          var sy = H * (S.posYPct / 100) - sh * 0.5;
-
-          if (shadowImg) {
-            var rad = (scene.keyAngle * Math.PI) / 180;
-            var offX = Math.cos(rad + Math.PI) * sw * 0.02;
-            var offY = Math.abs(Math.sin(rad)) * sh * 0.03 + sh * 0.025;
-            var sc = 1.02;
-            var dw = sw * sc, dh = sh * sc;
-            var dx = sx - (dw - sw) / 2 + offX;
-            var dy = sy - (dh - sh) / 2 + offY;
-            ctx.save();
-            ctx.filter = 'blur(' + Math.max(6, Math.round(sw * 0.013)) + 'px)';
-            ctx.drawImage(shadowImg, dx, dy, dw, dh);
-            ctx.restore();
-          }
-
-          ctx.drawImage(litImg, sx, sy, sw, sh);
-
-          // Atmospheric tint
+        // Shadow
+        if (res.shadow) {
+          var rad = (scene.keyAngle * Math.PI) / 180;
+          var offX = Math.cos(rad + Math.PI) * sw * 0.02;
+          var offY = Math.abs(Math.sin(rad)) * sh * 0.03 + sh * 0.025;
+          var sc = 1.02;
+          var dw = sw * sc, dh = sh * sc;
+          var dx = sx - (dw - sw)/2 + offX;
+          var dy = sy - (dh - sh)/2 + offY;
           ctx.save();
-          ctx.globalCompositeOperation = 'overlay';
-          var grad = ctx.createLinearGradient(0, 0, 0, H);
-          grad.addColorStop(0, 'rgba(' + (scene.r|0) + ',' + (scene.g|0) + ',' + (scene.b|0) + ',0.05)');
-          grad.addColorStop(1, 'rgba(' + (scene.r|0) + ',' + (scene.g|0) + ',' + (scene.b|0) + ',0.02)');
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, W, H);
+          ctx.filter = 'blur(' + Math.max(8, Math.round(sw * 0.014)) + 'px)';
+          ctx.drawImage(res.shadow, dx, dy, dw, dh);
           ctx.restore();
+        }
 
-          // Vignette
-          ctx.save();
-          var vig = ctx.createRadialGradient(W/2, H/2, H*0.35, W/2, H/2, H*0.95);
-          vig.addColorStop(0, 'rgba(0,0,0,0)');
-          vig.addColorStop(1, 'rgba(0,0,0,0.32)');
-          ctx.fillStyle = vig;
-          ctx.fillRect(0, 0, W, H);
-          ctx.restore();
+        // Subject
+        ctx.drawImage(res.lit, sx, sy, sw, sh);
 
-          addGrain(W, H, 0.025);
+        // Atmospheric tint
+        ctx.save();
+        ctx.globalCompositeOperation = 'overlay';
+        var grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, 'rgba(' + (scene.r|0) + ',' + (scene.g|0) + ',' + (scene.b|0) + ',0.06)');
+        grad.addColorStop(1, 'rgba(' + (scene.r|0) + ',' + (scene.g|0) + ',' + (scene.b|0) + ',0.02)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
 
-          setProgress(100);
-          setTimeout(function() { setProgress(0); }, 400);
+        // Bottom gradient for text
+        ctx.save();
+        var bGrad = ctx.createLinearGradient(0, H * 0.55, 0, H);
+        bGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        bGrad.addColorStop(1, 'rgba(0,0,0,0.75)');
+        ctx.fillStyle = bGrad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
 
-          S.lastPNG = canvas.toDataURL('image/png');
-          downloadBtn.disabled = false;
-          setStatus('Composite ready. Download or tweak.', 'done');
-          setStatus2(W + '×' + H + ' · ' + S.preset);
-        }).catch(function(err) {
-          console.error(err);
-          setStatus('Shadow error: ' + err.message, 'error');
-        }).then(function() {
-          S.processing = false;
-          updateButtons();
-        });
+        // Vignette
+        ctx.save();
+        var vig = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.35, W/2, H/2, Math.max(W,H)*0.75);
+        vig.addColorStop(0, 'rgba(0,0,0,0)');
+        vig.addColorStop(1, 'rgba(0,0,0,0.4)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+
+        // Ad copy
+        drawAdCopy(W, H, scene);
+
+        // Grain
+        addGrain(W, H, 0.02);
+
+        setProgress(100);
+        setTimeout(function() { setProgress(0); }, 400);
+
+        S.lastPNG = canvas.toDataURL('image/png');
+        downloadBtn.disabled = false;
+        dimsEl.textContent = W + ' × ' + H + ' px';
+        setStatus('Ad ready. Download or try another format.', 'done');
       }).catch(function(err) {
         console.error(err);
         setStatus('Render error: ' + err.message, 'error');
+      }).then(function() {
         S.processing = false;
         updateButtons();
       });
@@ -615,16 +929,7 @@
     }
   }
 
-  // Status meta display (optional, appended to status text)
-  function setStatus2(meta) {
-    // Just append to the status text for now
-    // (could add a separate meta element)
-    statusText.textContent = 'Composite ready · ' + meta;
-  }
-
-  /* ============================================================
-     PLACEHOLDER
-     ============================================================ */
+  /* ============ PLACEHOLDER ============ */
   function drawPlaceholder() {
     canvas.width = 1400;
     canvas.height = 900;
@@ -633,19 +938,48 @@
     g.addColorStop(1, '#14141a');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 1400, 900);
-    ctx.fillStyle = '#2a2a30';
-    ctx.font = '300 40px Inter, sans-serif';
+
+    // Grid pattern
+    ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+    ctx.lineWidth = 1;
+    for (var x = 0; x < 1400; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 900); ctx.stroke();
+    }
+    for (var y = 0; y < 900; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1400, y); ctx.stroke();
+    }
+
+    // Logo mark
+    var grad = ctx.createLinearGradient(650, 380, 750, 480);
+    grad.addColorStop(0, '#ffb347');
+    grad.addColorStop(1, '#ff7e5f');
+    ctx.fillStyle = grad;
+    roundRect(ctx, 660, 380, 80, 80, 20);
+    ctx.fill();
+
+    ctx.fillStyle = '#1a1a1f';
+    ctx.font = '900 44px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText("Mulanga's Studio", 700, 400);
-    ctx.font = '300 18px Inter, sans-serif';
-    ctx.fillStyle = '#1f1f24';
-    ctx.fillText('Upload a background + car photo to begin', 700, 450);
+    ctx.fillText('M', 700, 424);
+
+    ctx.fillStyle = '#3a3a44';
+    ctx.font = '800 24px "Bebas Neue", Impact, sans-serif';
+    ctx.letterSpacing = '6px';
+    ctx.fillText("MULANGA'S STUDIO", 700, 500);
+
+    ctx.fillStyle = '#1f1f28';
+    ctx.font = '500 13px Inter, sans-serif';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('AUTOMOTIVE AD CREATOR', 700, 530);
+
+    ctx.fillStyle = '#2a2a34';
+    ctx.font = '400 13px Inter, sans-serif';
+    ctx.letterSpacing = '1px';
+    ctx.fillText('Upload a scene and a vehicle to begin', 700, 620);
   }
 
-  /* ============================================================
-     EVENT: BACKGROUND
-     ============================================================ */
+  /* ============ EVENTS ============ */
   bgInput.addEventListener('change', function(e) {
     var f = e.target.files[0];
     if (!f) return;
@@ -655,58 +989,61 @@
       S.bgReady = true;
       bgZone.classList.add('has');
       bgThumb.src = img.src;
-      bgBadge.textContent = img.width + '×' + img.height;
-      bgBadge.classList.add('ok');
-      setStatus('Background loaded. Upload the car next.', 'done');
+      bgName.textContent = f.name;
+      setStatus('Background loaded.', 'done');
       updateButtons();
       if (S.cutoutReady) render();
+      else toast('Background ready — now add the vehicle');
     }).catch(function(err) {
-      setStatus('Background error: ' + err.message, 'error');
+      setStatus('Error: ' + err.message, 'error');
     });
   });
 
-  /* ============================================================
-     EVENT: FOREGROUND (with built-in cutout)
-     ============================================================ */
   fgInput.addEventListener('change', function(e) {
     var f = e.target.files[0];
     if (!f) return;
-    setStatus('Loading car photo…', 'working');
+    setStatus('Loading vehicle…', 'working');
     setProgress(10);
-
     loadImageFromFile(f).then(function(img) {
       S.fg = img;
       S.fgReady = true;
       fgZone.classList.add('has');
       fgThumb.src = img.src;
-      fgBadge.textContent = img.width + '×' + img.height;
-      fgBadge.classList.add('ok');
-
+      fgName.textContent = f.name;
       setStatus('Isolating subject…', 'working');
       setProgress(40);
-
       return fastCutout(img);
     }).then(function(cutout) {
       S.cutout = cutout;
       S.cutoutReady = true;
       setProgress(100);
       setTimeout(function() { setProgress(0); }, 400);
-      setStatus('Subject ready. Rendering composite…', 'done');
       updateButtons();
-      if (S.bgReady) setTimeout(render, 150);
-      else setStatus('Subject ready. Upload the background next.', 'done');
+      if (S.bgReady) { toast('Building your ad…'); setTimeout(render, 150); }
+      else { setStatus('Vehicle ready. Now add a background.', 'done'); toast('Vehicle ready — add a background'); }
     }).catch(function(err) {
       console.error(err);
-      setStatus('Subject error: ' + err.message, 'error');
+      setStatus('Error: ' + err.message, 'error');
       setProgress(0);
     });
   });
 
-  /* ============================================================
-     EVENT: PRESETS
-     ============================================================ */
+  // Format tabs
+  var formatTabs = document.querySelectorAll('.tab');
+  for (var ti = 0; ti < formatTabs.length; ti++) {
+    (function(el) {
+      el.addEventListener('click', function() {
+        for (var k = 0; k < formatTabs.length; k++) formatTabs[k].classList.remove('active');
+        el.classList.add('active');
+        S.format = el.getAttribute('data-format');
+        if (S.bgReady && S.cutoutReady) render();
+      });
+    })(formatTabs[ti]);
+  }
+
+  // Presets
   var presetEls = document.querySelectorAll('.preset');
-  for (var i = 0; i < presetEls.length; i++) {
+  for (var pi = 0; pi < presetEls.length; pi++) {
     (function(el) {
       el.addEventListener('click', function() {
         for (var k = 0; k < presetEls.length; k++) presetEls[k].classList.remove('active');
@@ -714,18 +1051,13 @@
         S.preset = el.getAttribute('data-preset');
         if (S.bgReady && S.cutoutReady) render();
       });
-    })(presetEls[i]);
+    })(presetEls[pi]);
   }
 
-  /* ============================================================
-     EVENT: SLIDERS
-     ============================================================ */
+  // Sliders
   function bindSlider(id, valId, key, fmt) {
     var s = $(id), v = $(valId);
-    function update() {
-      S[key] = +s.value;
-      v.textContent = fmt ? fmt(s.value) : (s.value + '%');
-    }
+    function update() { S[key] = +s.value; v.textContent = fmt ? fmt(s.value) : (s.value + '%'); }
     s.addEventListener('input', update);
     s.addEventListener('change', function() { if (S.bgReady && S.cutoutReady) render(); });
     update();
@@ -736,22 +1068,18 @@
   bindSlider('blend', 'blendV', 'blendAmt');
   bindSlider('warm', 'warmV', 'warmth', function(v) { return (v > 0 ? '+' : '') + v; });
 
-  /* ============================================================
-     EVENT: BUTTONS
-     ============================================================ */
+  // Buttons
   renderBtn.addEventListener('click', render);
-
   downloadBtn.addEventListener('click', function() {
     if (!S.lastPNG) return;
     var a = document.createElement('a');
     a.href = S.lastPNG;
-    a.download = "mulangas-studio-" + S.preset + "-" + Date.now() + ".png";
+    a.download = "mulangas-ad-" + S.format + "-" + S.preset + "-" + Date.now() + ".png";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setStatus('Downloaded.', 'done');
+    toast('Downloaded ' + S.format + ' ad');
   });
-
   resetBtn.addEventListener('click', function() {
     bgInput.value = ''; fgInput.value = '';
     S.bg = S.fg = S.cutout = null;
@@ -760,20 +1088,20 @@
     bgZone.classList.remove('has');
     fgZone.classList.remove('has');
     bgThumb.src = ''; fgThumb.src = '';
-    bgBadge.textContent = 'empty'; bgBadge.classList.remove('ok');
-    fgBadge.textContent = 'empty'; fgBadge.classList.remove('ok');
+    bgName.textContent = 'City · road · beach · studio';
+    fgName.textContent = 'Side · 3/4 · front view';
+    dimsEl.textContent = '—';
     drawPlaceholder();
     setStatus('Reset. Upload both images to begin.');
     updateButtons();
+    toast('Reset complete');
   });
 
-  /* ============================================================
-     INIT
-     ============================================================ */
+  /* ============ INIT ============ */
   drawPlaceholder();
   setStatus('Upload both images to begin.');
   updateButtons();
-  console.log("Mulanga's Studio ready.");
+  console.log("Mulanga's Studio — ready");
 
 })();
 </script>
